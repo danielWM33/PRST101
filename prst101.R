@@ -88,7 +88,8 @@ summarized_predator_species <- summarized_predator %>%
   summarize(
             meso_fo = mean(any_meso),
             cpf_fo = mean(any_cpf),
-            n = sum(predator_id/predator_id))
+            n = n())
+            #n = sum(predator_id/predator_id))
 
 View(summarized_predator_species)
 
@@ -110,17 +111,19 @@ View(summarized_predator_species)
 # P4 How many predator species had a mesopelagic FO greater than 0.5? Which of
 # those predator species had the largest sample size?
 
+summarized_predator_species[summarized_predator_species$meso_fo > 0.5, ]
+
 # There was 6 species!
-# California sea lion
+# Humbolt squid
 
 
-species_scale %>%
+summarized_predator_species %>%
   # Only retain predator species that ate mesopelagic fish
   filter(meso_fo > 0) %>%
   # Flip sign of coastal pelagic FO (for plotting purposes)
   mutate(cpf_fo = -cpf_fo,
          # Format name and sample size
-         label = sprintf("%s (%d)", predator_scientific_name, n),
+         label = sprintf("%s (%d)", predator_common_name, n),
          # Order labels by descending mesopelagic FO
          label = fct_reorder(label, meso_fo)) %>%
   # Rename *_fo columns to human-readable
@@ -190,18 +193,21 @@ delphinus_fo1 <- delphinus_fo %>%
   )
 View(delphinus_fo1)
 
+wrong_order = 0
+wrong_order <- lissodelphis_fo1$lissodelphis_fo < delphinus_fo1$delphinus_fo
+sum(wrong_order)
+# 43 samples!
 
 
-
-index = 0
-for (n in 1:nrow(lissodelphis_fo1)) {
-
-  if (lissodelphis_fo1[n,2] > delphinus_fo1[n,2]) {
-    index <- index + 1
-  }
-
-}
-wrong_order <- index/1000
+# index = 0
+# for (n in 1:nrow(lissodelphis_fo1)) {
+#
+#   if (lissodelphis_fo1[n,2] > delphinus_fo1[n,2]) {
+#     index <- index + 1
+#   }
+#
+# }
+# wrong_order <- index/1000
 
 # P7 How does your result in P6 influence your confidence in the sample result
 # that Lissodelphis consume mesopelagic prey more frequently than Delphinus?
@@ -248,16 +254,10 @@ Dosidicus_fo1 <- Dosidicus_fo %>%
     Dosidicus_fo = (Dosidicus_samples/1136)
   )
 
-temp <- 0
-for (n in 1:nrow(Dosidicus_fo1)) {
-  temp <- temp + Dosidicus_fo1[n,2]
-}
+temp <- sum(Dosidicus_fo1$Dosidicus_fo)
 Dosidicus_mean <- temp/1000
 
-temp1 <- 0
-for (n in 1:nrow(Histioteuthidae_fo1)) {
-  temp1 <- temp1 + Histioteuthidae_fo1[n,2]
-}
+temp1 <- sum(Histioteuthidae_fo1$Histioteuthidae_fo)
 Histioteuthidae_mean <- temp1/1000
 
 # P11 What’s the standard deviation of mesopelagic FO across simulated samples
@@ -275,24 +275,29 @@ sd(m1)
 # P12 How frequently did Histioteuthidae mesopelagic FO fall outside the range
 # 0.45 - 0.65? How about Dosidicus gigas?
 
-index2 <- 0
-for (n in 1:nrow(Histioteuthidae_fo1)) {
+M <- sum(Histioteuthidae_fo1$Histioteuthidae_fo < 0.45 | Histioteuthidae_fo1$Histioteuthidae_fo > 0.65)
 
-  if (Histioteuthidae_fo1[n,2] > 0.65 | Histioteuthidae_fo1[n,2] < 0.45) {
-    index2 <- index2 + 1
-  }
+# index2 <- 0
+# for (n in 1:nrow(Histioteuthidae_fo1)) {
+#
+#   if (Histioteuthidae_fo1[n,2] > 0.65 | Histioteuthidae_fo1[n,2] < 0.45) {
+#     index2 <- index2 + 1
+#   }
+#
+# }
 
-}
 # Histioteuthidae 177
 
-index3 <- 0
-for (n in 1:nrow(Dosidicus_fo1)) {
+N <- sum(Dosidicus_fo1$Dosidicus_fo < 0.45 | Dosidicus_fo1$Dosidicus_fo > 0.65)
 
-  if (Dosidicus_fo1[n,2] > 0.65 | Dosidicus_fo1[n,2] < 0.45) {
-    index3 <- index3 + 1
-  }
+# index3 <- 0
+# for (n in 1:nrow(Dosidicus_fo1)) {
+#
+#   if (Dosidicus_fo1[n,2] > 0.65 | Dosidicus_fo1[n,2] < 0.45) {
+#     index3 <- index3 + 1
+#   }
+# }
 
-}
 # Dosidicus ZERO
 
 # P13 Based on your answers to P10-P12, what effect does sample size have on
