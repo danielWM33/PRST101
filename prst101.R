@@ -12,7 +12,6 @@ cctd_meso[cctd_meso$predator_id == 99112, ]
 
 
 View(cctd_meso)
-
 find_predator <- function() {
 index = c()
 
